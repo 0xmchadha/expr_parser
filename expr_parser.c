@@ -1,22 +1,21 @@
 #include<stdio.h>
 #include<stdbool.h>
 
+//(((f) * f))
+
 /*
+ * Grammar for Expressions:
+ *
  * Expr -> Expr AOP Expr | Term
  *
  * Term -> Term MOP Term | Factor | (Expr)
  *
  * AOP -> + | -
+ *
  * MOP -> * | /
+ *
  * Factor -> 0-9
  */
-
-/*
- * 2 + 3 * 4 + 8 * 10 - 10 * (4 + 4 * 4)
- *
- */
-//Fact + Fact * Fact + Fact
-
 
 #define EXPR "is an expr"
 #define N_EXPR "is not an expr"
@@ -90,6 +89,10 @@ bool Term(struct expr *e)
                 if (Expr(e) == true) {
                         if (CUR(e) == closeb) {
                                 NEXT(e);
+
+                                if (Mop(e) == true) {
+                                        return Term(e);
+                                }
                                 return true;
                         }
                 }
@@ -102,8 +105,10 @@ bool Expr(struct expr *e)
 {
         if (Term(e) == true) {
                 if (Aop(e) == true) {
-                                return Expr(e);
-                } else return true;
+                        return Expr(e);
+                }
+
+                return true;
         }
 
         if (CUR(e) == END)
@@ -112,15 +117,24 @@ bool Expr(struct expr *e)
         return false;
 }
 
+bool parse(struct expr *e)
+{
+        bool ret = Expr(e);
+
+        if (e->arr[e->num] != END)
+                return false;
+
+        return ret;
+}
+
 int main()
 {
-        //   expr1.arr = factor;
-        //enum symbols expr_test[] = {factor, add, openb, factor, mulp, factor, closeb, add, factor, mulp, factor, END};
-        //enum symbols expr_test[] = {factor, add, factor, mulp, factor, add, factor, mulp, factor, END};
-
-        enum symbols expr_test[] = {openb, factor, add, factor, closeb, closeb, END};
-
+        enum symbols expr_test[] = {openb, openb, openb, factor, closeb, mulp, factor, closeb, closeb, END};
         expr1.arr = expr_test;
 
-        printf("%s\n", Expr(&expr1) == true ? EXPR : N_EXPR);
+        printf("%s\n", parse(&expr1) == true ? EXPR : N_EXPR);
 }
+
+//(((f*f-f/f) * f))
+//(((f) * f))
+//(((f)*f))
