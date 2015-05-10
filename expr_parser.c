@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdbool.h>
+#include<assert.h>
 
 //(((f) * f))
 
@@ -16,9 +17,13 @@
  *
  * Factor -> 0-9
  */
+int factor_arr[1024];
+int ptr;
 
 #define EXPR "is an expr"
 #define N_EXPR "is not an expr"
+
+#define EMIT(e) fprintf(stdout, e"\n")
 
 struct expr
 {
@@ -44,6 +49,8 @@ enum symbols {
         closeb,
         END
 };
+char str[] = {'(', ')', '+', '*'};
+enum symbols str_sym[] = {openb, closeb, add, mulp};
 
 bool Aop(struct expr *e)
 {
@@ -74,10 +81,15 @@ bool Term(struct expr *e)
         enum symbols sym = CUR(e);
 
         if (sym == factor) {
+                //EMIT("PSH %d", factor_arr[ptr++]);
+                fprintf(stdout,"PSH %d\n", factor_arr[ptr++]);
                 NEXT(e);
 
                 if (Mop(e) == true) {
-                        return Term(e);
+                        bool ret = Term(e);
+                        //EMIT("MUL");
+                        fprintf(stdout, "MUL\n");
+                        return ret;
                 }
 
                 return true;
@@ -91,7 +103,10 @@ bool Term(struct expr *e)
                                 NEXT(e);
 
                                 if (Mop(e) == true) {
-                                        return Term(e);
+                                        bool ret = Term(e);
+                                        //EMIT("MUL");
+                                        fprintf(stdout, "MUL\n");
+                                        return ret;
                                 }
                                 return true;
                         }
@@ -105,7 +120,10 @@ bool Expr(struct expr *e)
 {
         if (Term(e) == true) {
                 if (Aop(e) == true) {
-                        return Expr(e);
+                        bool ret = Expr(e);
+                        //EMIT("ADD");
+                        fprintf(stdout, "ADD");
+                        return ret;
                 }
 
                 return true;
@@ -129,7 +147,30 @@ bool parse(struct expr *e)
 
 int main()
 {
-        enum symbols expr_test[] = {openb, openb, openb, factor, closeb, mulp, factor, closeb, closeb, END};
+        enum symbols expr_test[1024];
+        //= {openb, openb, openb, factor, closeb, mulp, factor, closeb, closeb, END};
+        unsigned char c;
+        int i = 0;
+
+        while ((c = getchar()) && !feof(stdin)) {
+                int j;
+                bool is_factor = false;
+
+                for (j = 0; j < strlen(str); j++) {
+                        if (c == str[j])
+                                expr_test[i++] = str_sym[j];
+                }
+
+                if (j == strlen(str)) {
+                        expr_test[i++] = factor;
+                        factor_arr[ptr++] = atoi(&c);
+                        is_factor = true;
+                }
+
+                assert(j < strlen(str) || is_factor == true);
+        }
+
+        ptr = 0;
         expr1.arr = expr_test;
 
         printf("%s\n", parse(&expr1) == true ? EXPR : N_EXPR);
