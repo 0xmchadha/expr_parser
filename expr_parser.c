@@ -49,6 +49,7 @@ enum symbols {
         closeb,
         END
 };
+
 char str[] = {'(', ')', '+', '*'};
 enum symbols str_sym[] = {openb, closeb, add, mulp};
 
@@ -121,11 +122,10 @@ bool Expr(struct expr *e)
         if (Term(e) == true) {
                 if (Aop(e) == true) {
                         bool ret = Expr(e);
-                        //EMIT("ADD");
-                        fprintf(stdout, "ADD");
+                        //EMIT("ADD\n");
+                        fprintf(stdout, "ADD\n");
                         return ret;
                 }
-
                 return true;
         }
 
@@ -156,9 +156,16 @@ int main()
                 int j;
                 bool is_factor = false;
 
+                /* This is LF */
+                if (c == '\n')
+                        continue;
+
                 for (j = 0; j < strlen(str); j++) {
-                        if (c == str[j])
+                        if (c == str[j]) {
                                 expr_test[i++] = str_sym[j];
+
+                                break;
+                        }
                 }
 
                 if (j == strlen(str)) {
@@ -169,6 +176,8 @@ int main()
 
                 assert(j < strlen(str) || is_factor == true);
         }
+
+        expr_test[i] = END;
 
         ptr = 0;
         expr1.arr = expr_test;
