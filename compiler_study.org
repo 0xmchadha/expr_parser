@@ -1,0 +1,11 @@
+
+This document contains the pointers to some of the documents I have come across,
+in the area of compilers. I hope to learn and appreciate the ideas that have come
+across in this field.
+
+* Pratt's Top Down Operator precedence
+  Not studied yet. Very briefly what it looks like it is an improvement on
+  recursive descent parser used in jsLint. Hopefully this will be interesting to
+  learn. Also Eli bendersky wrote an article on it.
+  http://tdop.github.io/
+
